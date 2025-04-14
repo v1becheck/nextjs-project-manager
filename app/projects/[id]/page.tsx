@@ -342,7 +342,7 @@ export default function ProjectDetailPage() {
             <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
               <select
                 value={status}
-                onChange={(e) => setStatus(e.target.value as any)}
+                onChange={(e) => setStatus(e.target.value as Task['status'])}
                 className='w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500'
               >
                 <option value='todo'>Todo</option>
@@ -351,7 +351,9 @@ export default function ProjectDetailPage() {
               </select>
               <select
                 value={priority}
-                onChange={(e) => setPriority(e.target.value as any)}
+                onChange={(e) =>
+                  setPriority(e.target.value as Task['priority'])
+                }
                 className='w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500'
               >
                 <option value='low'>Low</option>

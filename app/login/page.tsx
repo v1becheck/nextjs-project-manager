@@ -24,8 +24,12 @@ export default function LoginPage() {
         throw new Error(data.error || 'Login failed');
       }
       router.push('/projects');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred');
+      }
     }
   };
 
@@ -61,7 +65,7 @@ export default function LoginPage() {
           </button>
         </form>
         <p className='text-center mt-4 text-gray-600'>
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <a href='/register' className='text-blue-600 cursor-pointer'>
             Register
           </a>
