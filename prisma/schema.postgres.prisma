@@ -1,7 +1,5 @@
-// Not used since there are sqlite and postgres schemas
-
 datasource db {
-  provider = env(DB_PROVIDER)
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
