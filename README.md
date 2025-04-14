@@ -16,7 +16,7 @@ A lightweight internal tool to manage projects and tasks.
 
 1. **Clone & Install**
 ```bash
-git clone [<repo-url>](https://github.com/v1becheck/nextjs-project-manager.git)
+git clone https://github.com/v1becheck/nextjs-project-manager.git
 cd nextjs-project-manager
 npm install
 ```
@@ -45,6 +45,4 @@ components/ – UI components (ThemeToggle, etc.)<br>
 tailwind.config.js – Tailwind setup<br>
 .env – Environment variables<br>
 
-## Deployed
 
-Vercel
