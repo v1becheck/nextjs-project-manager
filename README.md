@@ -45,6 +45,4 @@ components/ – UI components (ThemeToggle, etc.)<br>
 tailwind.config.js – Tailwind setup<br>
 .env – Environment variables<br>
 
-## Deployed
 
-Vercel
