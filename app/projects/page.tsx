@@ -1,9 +1,9 @@
-// app/projects/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import FilterDarkModeToggle from '@/components/FilterDarkModeToggle';
 
 interface Project {
   id: number;
@@ -94,12 +94,21 @@ export default function ProjectsPage() {
     <div className='min-h-screen bg-gray-100'>
       <header className='flex items-center justify-between bg-white py-4 px-6 shadow'>
         <h1 className='text-3xl font-bold text-gray-800'>Your Projects</h1>
-        <button
-          onClick={handleLogout}
-          className='text-gray-600 hover:underline'
-        >
-          Logout
-        </button>
+        <div className='flex items-center space-x-4'>
+          <FilterDarkModeToggle />
+          <button
+            onClick={async () => {
+              await fetch('/api/auth/logout', {
+                method: 'POST',
+                credentials: 'include',
+              });
+              router.push('/login');
+            }}
+            className='text-gray-600 dark:text-gray-300 hover:underline'
+          >
+            Logout
+          </button>
+        </div>
       </header>
       <main className='max-w-4xl mx-auto p-6'>
         {projects.length === 0 ? (

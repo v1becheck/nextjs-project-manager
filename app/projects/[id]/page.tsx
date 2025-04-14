@@ -1,4 +1,3 @@
-// app/projects/[id]/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -32,7 +31,6 @@ export default function ProjectDetailPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch project information
         const projRes = await fetch(`/api/projects/${projectId}`, {
           credentials: 'include',
         });
@@ -43,7 +41,6 @@ export default function ProjectDetailPage() {
           router.push('/projects');
         }
 
-        // Fetch tasks for this project
         const taskRes = await fetch(`/api/tasks?projectId=${projectId}`, {
           credentials: 'include',
         });
@@ -68,7 +65,6 @@ export default function ProjectDetailPage() {
     }
     try {
       if (editingTaskId === null) {
-        // Create new task
         const res = await fetch('/api/tasks', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -79,7 +75,6 @@ export default function ProjectDetailPage() {
         const newTask = await res.json();
         setTasks((prev) => [...prev, newTask]);
       } else {
-        // Update existing task
         const res = await fetch(`/api/tasks/${editingTaskId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -92,7 +87,7 @@ export default function ProjectDetailPage() {
           prev.map((t) => (t.id === editingTaskId ? updated : t))
         );
       }
-      // Reset form fields
+
       setTitle('');
       setDescription('');
       setEditingTaskId(null);

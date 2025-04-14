@@ -10,3 +10,7 @@ input,
 textarea {
   @apply transition-all duration-400 ease-in-out;
 }
+
+.dark-mode {
+  filter: invert(1) hue-rotate(180deg);
+}
