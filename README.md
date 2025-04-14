@@ -15,26 +15,26 @@ A lightweight internal tool to manage projects and tasks.
 ## Getting Started
 
 1. **Clone & Install**
-   ```bash
-   git clone [<repo-url>](https://github.com/v1becheck/nextjs-project-manager.git)
-   cd nextjs-project-manager
-   npm install
-   ```
+```bash
+git clone [<repo-url>](https://github.com/v1becheck/nextjs-project-manager.git)
+cd nextjs-project-manager
+npm install
+```
 2. Environment
    Copy .env.example → .env and set:
-   ```bash
-   DATABASE_URL="file:./dev.db"
-   JWT_SECRET="your_jwt_secret"
-   NODE_ENV="development"
-   ```
+```bash
+DATABASE_URL="file:./dev.db"
+JWT_SECRET="your_jwt_secret"
+NODE_ENV="development"
+```
 3. Database setup
-   ```bash
-   npx prisma migrate dev --name init
-   ```
+```bash
+npx prisma migrate dev --name init
+```
 4. Run
-   ```bash
-   npm run dev
-   ```
+```bash
+npm run dev
+```
    Open http://localhost:3000
 
 ## Project Structure
