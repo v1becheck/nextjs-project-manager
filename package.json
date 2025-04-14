@@ -40,3 +40,16 @@
     "typescript": "^5"
   }
 }
+
+
+postgresql://postgres:UgAp@Xd4)N2iLnN@db.tbqemlecqihcokopasfy.supabase.co:5432/postgres?schema=public&sslmode=require
+postgresql://postgres:UgAp@Xd4)N2iLnN@db.tbqemlecqihcokopasfy.supabase.co:5432/postgres
+
+
+export DATABASE_URL="postgresql://postgres:UgAp@Xd4)N2iLnN@db.tbqemlecqihcokopasfy.supabase.co:5432/postgres?schema=public&sslmode=require"
+npx prisma db pull --schema=prisma/schema.postgres.prisma
+
+
+postgresql://postgres.tbqemlecqihcokopasfy:UgAp@Xd4)N2iLnN@aws-0-eu-central-1.pooler.supabase.com:5432/postgres
+
+postgresql://postgres:UgAp@Xd4)N2iLnN@db.tbqemlecqihcokopasfy.supabase.co:5432/postgres?schema=public&sslmode=require&connect_timeout=10
