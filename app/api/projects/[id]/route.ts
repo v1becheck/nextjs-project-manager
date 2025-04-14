@@ -1,94 +1,96 @@
-/* eslint-disable */
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
-
-function getUserId(request: Request) {
-  const token = (request as any).cookies.get('token')?.value;
+function getUserId(request: NextRequest) {
+  const token = request.cookies.get('token')?.value;
   if (!token) return null;
   try {
-    const { userId } = jwt.verify(token, process.env.JWT_SECRET!) as {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
       userId: number;
     };
-    return userId;
+    return decoded.userId;
   } catch {
     return null;
   }
 }
 
-export async function GET(request: Request, context: unknown) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   const userId = getUserId(request);
+  const projectId = parseInt(params.id, 10);
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { id } = (context as { params: { id: string } }).params;
-  const taskId = parseInt(id, 10);
-
-  const task = await prisma.task.findFirst({
-    where: { id: taskId, project: { userId } },
+  const project = await prisma.project.findFirst({
+    where: { id: projectId, userId: userId },
   });
-  if (!task) {
-    return NextResponse.json({ error: 'Task not found' }, { status: 404 });
+  if (!project) {
+    return NextResponse.json({ error: 'Project not found' }, { status: 404 });
   }
-  return NextResponse.json(task);
+  return NextResponse.json(project);
 }
 
-export async function PUT(request: Request, context: unknown) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   const userId = getUserId(request);
+  const projectId = parseInt(params.id, 10);
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { id } = (context as { params: { id: string } }).params;
-  const taskId = parseInt(id, 10);
   const data = await request.json();
-  const { title, description, status, priority, due_date } = data;
+  const { name, description } = data;
 
-  const existing = await prisma.task.findFirst({
-    where: { id: taskId, project: { userId } },
+  const project = await prisma.project.findFirst({
+    where: { id: projectId, userId: userId },
   });
-  if (!existing) {
+  if (!project) {
     return NextResponse.json(
-      { error: 'Not found or forbidden' },
+      { error: 'Project not found or forbidden' },
       { status: 404 }
     );
   }
 
-  const updated = await prisma.task.update({
-    where: { id: taskId },
+  const updated = await prisma.project.update({
+    where: { id: projectId },
     data: {
-      title: title ?? existing.title,
-      description: description ?? existing.description,
-      status: status ?? existing.status,
-      priority: priority ?? existing.priority,
-      due_date: due_date !== undefined ? new Date(due_date) : existing.due_date,
+      name: name !== undefined ? name : project.name,
+      description:
+        description !== undefined ? description : project.description,
     },
   });
   return NextResponse.json(updated);
 }
 
-export async function DELETE(request: Request, context: unknown) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   const userId = getUserId(request);
+  const projectId = parseInt(params.id, 10);
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { id } = (context as { params: { id: string } }).params;
-  const taskId = parseInt(id, 10);
-
-  const existing = await prisma.task.findFirst({
-    where: { id: taskId, project: { userId } },
+  const project = await prisma.project.findFirst({
+    where: { id: projectId, userId: userId },
+    include: { tasks: true },
   });
-  if (!existing) {
+  if (!project) {
     return NextResponse.json(
-      { error: 'Not found or forbidden' },
+      { error: 'Project not found or forbidden' },
       { status: 404 }
     );
   }
 
-  await prisma.task.delete({ where: { id: taskId } });
-  return NextResponse.json({ message: 'Task deleted' });
+  await prisma.task.deleteMany({ where: { projectId: projectId } });
+  await prisma.project.delete({ where: { id: projectId } });
+  return NextResponse.json({ message: 'Project deleted' });
 }
