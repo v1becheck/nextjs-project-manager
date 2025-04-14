@@ -1,5 +1,5 @@
 // app/api/projects/[id]/route.ts
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse, NextRequest, RouteHandlerContext } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 
@@ -18,9 +18,11 @@ function getUserId(request: NextRequest) {
   }
 }
 
+type Params = { id: string };
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: RouteHandlerContext<Params>
 ) {
   const userId = getUserId(request);
   if (!userId) {
@@ -34,13 +36,12 @@ export async function GET(
   if (!project) {
     return NextResponse.json({ error: 'Project not found' }, { status: 404 });
   }
-
   return NextResponse.json(project);
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: RouteHandlerContext<Params>
 ) {
   const userId = getUserId(request);
   if (!userId) {
@@ -72,7 +73,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: RouteHandlerContext<Params>
 ) {
   const userId = getUserId(request);
   if (!userId) {
