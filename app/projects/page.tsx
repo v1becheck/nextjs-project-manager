@@ -64,8 +64,12 @@ export default function ProjectsPage() {
       setName('');
       setDescription('');
       setEditingId(null);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred');
+      }
     }
   };
 
@@ -83,11 +87,6 @@ export default function ProjectsPage() {
     if (res.ok) {
       setProjects((prev) => prev.filter((p) => p.id !== projectId));
     }
-  };
-
-  const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
-    router.push('/login');
   };
 
   return (
