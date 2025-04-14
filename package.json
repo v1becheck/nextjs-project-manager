@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "prepare": "prisma generate --schema=prisma/schema.sqlite.prisma",
-    "dev":    "DATABASE_URL=\"file:./dev.db\" prisma migrate dev --schema=prisma/schema.sqlite.prisma && next dev --turbopack",
+    "dev":    "DATABASE_URL=\"file:./dev.db\" prisma migrate dev --schema=prisma/schema.sqlite.prisma && next dev",
     "build":  "prisma generate --schema=prisma/schema.postgres.prisma && prisma migrate deploy --schema=prisma/schema.postgres.prisma && next build",
     "postinstall": "prisma generate",
     "start": "next start",
