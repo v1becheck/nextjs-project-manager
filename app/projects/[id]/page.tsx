@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { ReactSortable } from 'react-sortablejs';
 
 interface Task {
   id: number;
@@ -30,8 +31,8 @@ export default function ProjectDetailPage() {
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [status, setStatus] = useState<'todo' | 'in-progress' | 'done'>('todo');
-  const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium');
+  const [status, setStatus] = useState<Task['status']>('todo');
+  const [priority, setPriority] = useState<Task['priority']>('medium');
   const [dueDate, setDueDate] = useState('');
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
 
@@ -41,72 +42,67 @@ export default function ProjectDetailPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const projRes = await fetch(`/api/projects/${projectId}`, {
-          credentials: 'include',
-        });
-        if (projRes.ok) {
-          setProject(await projRes.json());
-        } else if (projRes.status === 404) {
-          router.push('/projects');
-        }
+      const projRes = await fetch(`/api/projects/${projectId}`, {
+        credentials: 'include',
+      });
+      if (projRes.ok) {
+        setProject(await projRes.json());
+      } else if (projRes.status === 404) {
+        router.push('/projects');
+      }
 
-        const taskRes = await fetch(`/api/tasks?projectId=${projectId}`, {
-          credentials: 'include',
-        });
-        if (taskRes.ok) {
-          setTasks(await taskRes.json());
-        }
-      } catch (err) {
-        console.error(err);
+      const taskRes = await fetch(`/api/tasks?projectId=${projectId}`, {
+        credentials: 'include',
+      });
+      if (taskRes.ok) {
+        setTasks(await taskRes.json());
       }
     };
-
     fetchData();
   }, [projectId, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
     if (!title.trim()) {
       setError('Task title is required');
       return;
     }
-    try {
-      const body = {
-        title,
-        description,
-        status,
-        priority,
-        due_date: dueDate || null,
-        projectId,
-      };
-      const res = await fetch(
-        editingTaskId ? `/api/tasks/${editingTaskId}` : '/api/tasks',
-        {
-          method: editingTaskId ? 'PUT' : 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify(body),
-        }
-      );
-      if (!res.ok) throw new Error('Failed to save task');
-      const saved = await res.json();
-      setTasks((prev) =>
-        editingTaskId
-          ? prev.map((t) => (t.id === editingTaskId ? saved : t))
-          : [...prev, saved]
-      );
+    setError(null);
 
-      setTitle('');
-      setDescription('');
-      setStatus('todo');
-      setPriority('medium');
-      setDueDate('');
-      setEditingTaskId(null);
-    } catch (err: any) {
-      setError(err.message);
+    const body = {
+      title,
+      description,
+      status,
+      priority,
+      due_date: dueDate || null,
+      projectId,
+    };
+    const url = editingTaskId ? `/api/tasks/${editingTaskId}` : '/api/tasks';
+    const method = editingTaskId ? 'PUT' : 'POST';
+
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      setError('Failed to save task');
+      return;
     }
+    const saved = await res.json();
+    setTasks((prev) =>
+      editingTaskId
+        ? prev.map((t) => (t.id === editingTaskId ? saved : t))
+        : [...prev, saved]
+    );
+
+    setTitle('');
+    setDescription('');
+    setStatus('todo');
+    setPriority('medium');
+    setDueDate('');
+    setEditingTaskId(null);
   };
 
   const startEditTask = (task: Task) => {
@@ -115,7 +111,7 @@ export default function ProjectDetailPage() {
     setDescription(task.description || '');
     setStatus(task.status);
     setPriority(task.priority);
-    setDueDate(task.due_date ? task.due_date.split('T')[0] : '');
+    setDueDate(task.due_date.split('T')[0] || '');
   };
 
   const handleDeleteTask = async (taskId: number) => {
@@ -135,6 +131,9 @@ export default function ProjectDetailPage() {
     if (filterDueDate && task.due_date !== filterDueDate) return false;
     return true;
   });
+
+  const noFiltersActive =
+    filterStatus === 'all' && filterPriority === 'all' && !filterDueDate;
 
   return (
     <div className='min-h-screen bg-gray-50 transition-all duration-200 ease-in-out'>
@@ -214,10 +213,65 @@ export default function ProjectDetailPage() {
         {/* Task List */}
         <section className='mb-8'>
           <h3 className='text-xl font-semibold mb-4 text-gray-800'>Tasks</h3>
+
           {filteredTasks.length === 0 ? (
             <p className='text-gray-600'>
               No tasks match the selected filters.
             </p>
+          ) : noFiltersActive ? (
+            <ReactSortable
+              list={tasks}
+              setList={setTasks}
+              tag='ul'
+              className='space-y-4'
+              animation={150}
+              ghostClass='opacity-50'
+              handle='.handle'
+            >
+              {tasks.map((task) => (
+                <li
+                  key={task.id}
+                  data-id={task.id.toString()}
+                  className='bg-white p-4 rounded shadow flex justify-between items-start transition-all duration-200 ease-in-out cursor-grab'
+                >
+                  <div className='flex items-center space-x-2'>
+                    <span className='handle cursor-grab'>⋮⋮</span>
+                    <div>
+                      <p className='text-lg font-medium text-gray-800'>
+                        {task.title}
+                      </p>
+                      {task.description && (
+                        <p className='text-gray-600 mt-1'>{task.description}</p>
+                      )}
+                      <div className='mt-2 text-sm text-gray-500 space-x-2'>
+                        <span>Status: {task.status}</span>
+                        <span>Priority: {task.priority}</span>
+                        <span>
+                          Due:{' '}
+                          {task.due_date
+                            ? new Date(task.due_date).toLocaleDateString()
+                            : '—'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className='flex flex-col items-end space-y-2'>
+                    <button
+                      onClick={() => startEditTask(task)}
+                      className='text-sm text-blue-600 cursor-pointer transition-all duration-200 ease-in-out'
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteTask(task.id)}
+                      className='text-sm text-red-600 cursor-pointer transition-all duration-200 ease-in-out'
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ReactSortable>
           ) : (
             <ul className='space-y-4'>
               {filteredTasks.map((task) => (
@@ -232,9 +286,9 @@ export default function ProjectDetailPage() {
                     {task.description && (
                       <p className='text-gray-600 mt-1'>{task.description}</p>
                     )}
-                    <div className='mt-2 text-sm text-gray-500'>
-                      <span className='mr-2'>Status: {task.status}</span>
-                      <span className='mr-2'>Priority: {task.priority}</span>
+                    <div className='mt-2 text-sm text-gray-500 space-x-2'>
+                      <span>Status: {task.status}</span>
+                      <span>Priority: {task.priority}</span>
                       <span>
                         Due:{' '}
                         {task.due_date
@@ -314,7 +368,7 @@ export default function ProjectDetailPage() {
             <div className='flex items-center space-x-4'>
               <button
                 type='submit'
-                className='bg-blue-600 text-white cursor-pointer px-5 py-2 rounded hover:bg-blue-700 transition-colors'
+                className='bg-blue-600 cursor-pointer text-white px-5 py-2 rounded hover:bg-blue-700 transition-colors'
               >
                 {editingTaskId ? 'Update Task' : 'Add Task'}
               </button>
