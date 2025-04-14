@@ -119,7 +119,7 @@ export default function ProjectDetailPage() {
       <header className='bg-white shadow py-4 px-6 flex items-center justify-between'>
         <button
           onClick={() => router.push('/projects')}
-          className='text-blue-600 hover:underline text-sm'
+          className='text-blue-600 cursor-pointer text-sm'
         >
           &larr; Back to Projects
         </button>
@@ -166,13 +166,13 @@ export default function ProjectDetailPage() {
                   <div className='flex flex-col items-end space-y-2'>
                     <button
                       onClick={() => startEditTask(task)}
-                      className='text-sm text-blue-600 hover:underline'
+                      className='text-sm text-blue-600 cursor-pointer'
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDeleteTask(task.id)}
-                      className='text-sm text-red-600 hover:underline'
+                      className='text-sm text-red-600 cursor-pointer'
                     >
                       Delete
                     </button>
@@ -208,7 +208,7 @@ export default function ProjectDetailPage() {
             <div className='flex items-center space-x-4'>
               <button
                 type='submit'
-                className='bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition-colors'
+                className='bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition-colors cursor-pointer'
               >
                 {editingTaskId ? 'Update Task' : 'Add Task'}
               </button>
@@ -220,7 +220,7 @@ export default function ProjectDetailPage() {
                     setTitle('');
                     setDescription('');
                   }}
-                  className='text-gray-600 hover:underline'
+                  className='text-gray-600 cursor-pointer'
                 >
                   Cancel
                 </button>

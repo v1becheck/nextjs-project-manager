@@ -14,7 +14,7 @@ export default function FilterDarkModeToggle() {
   return (
     <button
       onClick={() => setIsDarkMode((prev) => !prev)}
-      className='px-4 py-2 border rounded'
+      className='px-4 py-2 border rounded cursor-pointer transition-colors duration-300'
     >
       {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
     </button>

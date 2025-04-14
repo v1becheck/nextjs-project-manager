@@ -104,7 +104,7 @@ export default function ProjectsPage() {
               });
               router.push('/login');
             }}
-            className='text-gray-600 dark:text-gray-300 hover:underline'
+            className='text-gray-600 dark:text-gray-300 cursor-pointer'
           >
             Logout
           </button>
@@ -125,7 +125,7 @@ export default function ProjectsPage() {
                 <div>
                   <Link
                     href={`/projects/${project.id}`}
-                    className='text-xl font-semibold text-blue-600 hover:underline'
+                    className='text-xl font-semibold text-blue-600 cursor-pointer'
                   >
                     {project.name}
                   </Link>
@@ -136,13 +136,13 @@ export default function ProjectsPage() {
                 <div>
                   <button
                     onClick={() => startEdit(project)}
-                    className='text-gray-700 mr-4 hover:underline'
+                    className='text-gray-700 mr-4 cursor-pointer'
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(project.id)}
-                    className='text-red-600 hover:underline'
+                    className='text-red-600 cursor-pointer'
                   >
                     Delete
                   </button>
@@ -175,7 +175,7 @@ export default function ProjectsPage() {
             <div className='flex items-center space-x-4'>
               <button
                 type='submit'
-                className='bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition'
+                className='bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition cursor-pointer'
               >
                 {editingId ? 'Update Project' : 'Add Project'}
               </button>
@@ -187,7 +187,7 @@ export default function ProjectsPage() {
                     setName('');
                     setDescription('');
                   }}
-                  className='text-sm text-gray-600 hover:underline'
+                  className='text-sm text-gray-600 cursor-pointer'
                 >
                   Cancel
                 </button>
