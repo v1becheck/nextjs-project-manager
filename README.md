@@ -39,8 +39,12 @@ A lightweight internal tool to manage projects and tasks.
 
 ## Project Structure
 
-app/ – Next.js App Router pages & API routes
-prisma/ – Schema & migrations
-components/ – UI components (ThemeToggle, etc.)
-tailwind.config.js – Tailwind setup
-.env – Environment variables
+app/ – Next.js App Router pages & API routes<br>
+prisma/ – Schema & migrations<br>
+components/ – UI components (ThemeToggle, etc.)<br>
+tailwind.config.js – Tailwind setup<br>
+.env – Environment variables<br>
+
+## Deployed
+
+Vercel
