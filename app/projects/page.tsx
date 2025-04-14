@@ -1,3 +1,4 @@
+// app/projects/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -32,7 +33,7 @@ export default function ProjectsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (!name) {
+    if (!name.trim()) {
       setError('Project name is required');
       return;
     }
@@ -60,7 +61,6 @@ export default function ProjectsPage() {
           prev.map((p) => (p.id === editingId ? updated : p))
         );
       }
-
       setName('');
       setDescription('');
       setEditingId(null);
@@ -76,7 +76,6 @@ export default function ProjectsPage() {
   };
 
   const handleDelete = async (projectId: number) => {
-    if (!confirm('Are you sure you want to delete this project?')) return;
     const res = await fetch(`/api/projects/${projectId}`, {
       method: 'DELETE',
       credentials: 'include',
@@ -92,100 +91,102 @@ export default function ProjectsPage() {
   };
 
   return (
-    <div className='max-w-2xl mx-auto p-4'>
-      <div className='flex justify-between items-center mb-6'>
-        <h1 className='text-3xl font-bold'>Your Projects</h1>
+    <div className='min-h-screen bg-gray-100'>
+      <header className='flex items-center justify-between bg-white py-4 px-6 shadow'>
+        <h1 className='text-3xl font-bold text-gray-800'>Your Projects</h1>
         <button
           onClick={handleLogout}
-          className='text-sm text-gray-600 underline'
+          className='text-gray-600 hover:underline'
         >
           Logout
         </button>
-      </div>
-
-      {/* Projects List */}
-      {projects.length === 0 ? (
-        <p>No projects yet. Create one below!</p>
-      ) : (
-        <ul className='mb-8'>
-          {projects.map((project) => (
-            <li
-              key={project.id}
-              className='border-b py-2 flex justify-between items-center'
-            >
-              <div>
-                <Link
-                  href={`/projects/${project.id}`}
-                  className='text-blue-600 hover:underline'
-                >
-                  {project.name}
-                </Link>
-                {project.description && (
-                  <p className='text-sm text-gray-600'>{project.description}</p>
-                )}
-              </div>
-              <div>
-                <button
-                  onClick={() => startEdit(project)}
-                  className='text-sm text-gray-700 mr-4'
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(project.id)}
-                  className='text-sm text-red-600'
-                >
-                  Delete
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {/* Create/Edit Project Form */}
-      <div className='bg-gray-100 p-4 rounded'>
-        <h2 className='text-xl font-semibold mb-2'>
-          {editingId ? 'Edit Project' : 'New Project'}
-        </h2>
-        <form onSubmit={handleSubmit} className='flex flex-col space-y-3'>
-          {error && <p className='text-red-600'>{error}</p>}
-          <input
-            type='text'
-            placeholder='Project name'
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className='p-2 border'
-          />
-          <textarea
-            placeholder='Description (optional)'
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className='p-2 border'
-          />
-          <div className='flex items-center space-x-4'>
-            <button
-              type='submit'
-              className='bg-green-600 text-white px-4 py-2 rounded'
-            >
-              {editingId ? 'Update Project' : 'Add Project'}
-            </button>
-            {editingId && (
-              <button
-                type='button'
-                onClick={() => {
-                  setEditingId(null);
-                  setName('');
-                  setDescription('');
-                }}
-                className='text-sm'
+      </header>
+      <main className='max-w-4xl mx-auto p-6'>
+        {projects.length === 0 ? (
+          <p className='text-center text-gray-600'>
+            No projects yet. Create one below!
+          </p>
+        ) : (
+          <ul className='space-y-4 mb-8'>
+            {projects.map((project) => (
+              <li
+                key={project.id}
+                className='bg-white p-4 rounded shadow flex justify-between items-center'
               >
-                Cancel
+                <div>
+                  <Link
+                    href={`/projects/${project.id}`}
+                    className='text-xl font-semibold text-blue-600 hover:underline'
+                  >
+                    {project.name}
+                  </Link>
+                  {project.description && (
+                    <p className='text-gray-500'>{project.description}</p>
+                  )}
+                </div>
+                <div>
+                  <button
+                    onClick={() => startEdit(project)}
+                    className='text-gray-700 mr-4 hover:underline'
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(project.id)}
+                    className='text-red-600 hover:underline'
+                  >
+                    Delete
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <div className='bg-white p-6 rounded shadow'>
+          <h2 className='text-2xl font-semibold mb-4'>
+            {editingId ? 'Edit Project' : 'New Project'}
+          </h2>
+          {error && <p className='text-red-500 mb-4'>{error}</p>}
+          <form onSubmit={handleSubmit} className='space-y-4'>
+            <input
+              type='text'
+              placeholder='Project Name'
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className='w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500'
+              required
+            />
+            <textarea
+              placeholder='Description (optional)'
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className='w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500'
+            />
+            <div className='flex items-center space-x-4'>
+              <button
+                type='submit'
+                className='bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition'
+              >
+                {editingId ? 'Update Project' : 'Add Project'}
               </button>
-            )}
-          </div>
-        </form>
-      </div>
+              {editingId && (
+                <button
+                  type='button'
+                  onClick={() => {
+                    setEditingId(null);
+                    setName('');
+                    setDescription('');
+                  }}
+                  className='text-sm text-gray-600 hover:underline'
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
+          </form>
+        </div>
+      </main>
     </div>
   );
 }

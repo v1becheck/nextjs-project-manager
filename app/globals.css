@@ -3,3 +3,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+a,
+button,
+input,
+textarea {
+  @apply transition-all duration-400 ease-in-out;
+}

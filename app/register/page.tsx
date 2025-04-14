@@ -1,3 +1,4 @@
+// app/register/page.tsx
 'use client';
 
 import { useState } from 'react';
@@ -18,12 +19,12 @@ export default function RegisterPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),
+        credentials: 'include',
       });
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || 'Failed to register');
+        throw new Error(data.error || 'Registration failed');
       }
-
       router.push('/login');
     } catch (err: any) {
       setError(err.message);
@@ -31,38 +32,51 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className='max-w-sm mx-auto mt-12 p-6 bg-white rounded shadow'>
-      <h2 className='text-2xl font-bold mb-6 text-center'>Register</h2>
-      <form onSubmit={handleSubmit} className='flex flex-col space-y-4'>
-        {error && <p className='text-red-600'>{error}</p>}
-        <input
-          type='text'
-          placeholder='Name'
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className='border p-2'
-          required
-        />
-        <input
-          type='email'
-          placeholder='Email'
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className='border p-2'
-          required
-        />
-        <input
-          type='password'
-          placeholder='Password'
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className='border p-2'
-          required
-        />
-        <button type='submit' className='bg-blue-600 text-white py-2 rounded'>
-          Sign Up
-        </button>
-      </form>
+    <div className='min-h-screen flex items-center justify-center bg-gradient-to-r from-green-400 to-blue-500'>
+      <div className='bg-white p-8 rounded-lg shadow-md w-full max-w-md'>
+        <h2 className='text-3xl font-bold text-center text-gray-800 mb-6'>
+          Register
+        </h2>
+        {error && <div className='mb-4 text-red-500 text-center'>{error}</div>}
+        <form onSubmit={handleSubmit} className='space-y-4'>
+          <input
+            type='text'
+            placeholder='Name'
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className='w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500'
+            required
+          />
+          <input
+            type='email'
+            placeholder='Email'
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className='w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500'
+            required
+          />
+          <input
+            type='password'
+            placeholder='Password'
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className='w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500'
+            required
+          />
+          <button
+            type='submit'
+            className='w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition-colors'
+          >
+            Register
+          </button>
+        </form>
+        <p className='text-center mt-4 text-gray-600'>
+          Already have an account?{' '}
+          <a href='/login' className='text-green-600 hover:underline'>
+            Log In
+          </a>
+        </p>
+      </div>
     </div>
   );
 }

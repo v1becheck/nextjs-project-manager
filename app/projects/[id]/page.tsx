@@ -1,3 +1,4 @@
+// app/projects/[id]/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -30,36 +31,44 @@ export default function ProjectDetailPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      let projRes = await fetch(`/api/projects/${projectId}`, {
-        credentials: 'include',
-      });
-      if (projRes.ok) {
-        const projData = await projRes.json();
-        setProject(projData);
-      } else if (projRes.status === 404) {
-        router.push('/projects');
-      }
+      try {
+        // Fetch project information
+        const projRes = await fetch(`/api/projects/${projectId}`, {
+          credentials: 'include',
+        });
+        if (projRes.ok) {
+          const projData = await projRes.json();
+          setProject(projData);
+        } else if (projRes.status === 404) {
+          router.push('/projects');
+        }
 
-      let taskRes = await fetch(`/api/tasks?projectId=${projectId}`, {
-        credentials: 'include',
-      });
-      if (taskRes.ok) {
-        const taskData = await taskRes.json();
-        setTasks(taskData);
+        // Fetch tasks for this project
+        const taskRes = await fetch(`/api/tasks?projectId=${projectId}`, {
+          credentials: 'include',
+        });
+        if (taskRes.ok) {
+          const taskData = await taskRes.json();
+          setTasks(taskData);
+        }
+      } catch (err) {
+        console.error(err);
       }
     };
+
     fetchData();
   }, [projectId, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (!title) {
+    if (!title.trim()) {
       setError('Task title is required');
       return;
     }
     try {
       if (editingTaskId === null) {
+        // Create new task
         const res = await fetch('/api/tasks', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -70,6 +79,7 @@ export default function ProjectDetailPage() {
         const newTask = await res.json();
         setTasks((prev) => [...prev, newTask]);
       } else {
+        // Update existing task
         const res = await fetch(`/api/tasks/${editingTaskId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -82,6 +92,7 @@ export default function ProjectDetailPage() {
           prev.map((t) => (t.id === editingTaskId ? updated : t))
         );
       }
+      // Reset form fields
       setTitle('');
       setDescription('');
       setEditingTaskId(null);
@@ -97,7 +108,7 @@ export default function ProjectDetailPage() {
   };
 
   const handleDeleteTask = async (taskId: number) => {
-    if (!confirm('Delete this task?')) return;
+    if (!confirm('Are you sure you want to delete this task?')) return;
     const res = await fetch(`/api/tasks/${taskId}`, {
       method: 'DELETE',
       credentials: 'include',
@@ -108,104 +119,121 @@ export default function ProjectDetailPage() {
   };
 
   return (
-    <div className='max-w-xl mx-auto p-4'>
-      <button
-        onClick={() => router.push('/projects')}
-        className='underline text-sm mb-4 inline-block'
-      >
-        ← Back to Projects
-      </button>
+    <div className='min-h-screen bg-gray-50'>
+      {/* Header with back button */}
+      <header className='bg-white shadow py-4 px-6 flex items-center justify-between'>
+        <button
+          onClick={() => router.push('/projects')}
+          className='text-blue-600 hover:underline text-sm'
+        >
+          &larr; Back to Projects
+        </button>
+        <h1 className='text-3xl font-bold text-gray-800'>Project Details</h1>
+      </header>
 
-      {project ? (
-        <div className='mb-6'>
-          <h1 className='text-2xl font-bold'>{project.name}</h1>
-          {project.description && (
-            <p className='text-gray-700'>{project.description}</p>
-          )}
-        </div>
-      ) : (
-        <p className='mb-6'>Loading project...</p>
-      )}
-
-      {/* Tasks List */}
-      <h2 className='text-xl font-semibold mb-2'>Tasks</h2>
-      {tasks.length === 0 ? (
-        <p>No tasks for this project yet.</p>
-      ) : (
-        <ul className='mb-6'>
-          {tasks.map((task) => (
-            <li key={task.id} className='border-b py-2 flex justify-between'>
-              <div>
-                <span className='font-medium'>{task.title}</span>
-                {task.description && (
-                  <span className='text-sm text-gray-600'>
-                    {' '}
-                    – {task.description}
-                  </span>
-                )}
-              </div>
-              <div>
-                <button
-                  onClick={() => startEditTask(task)}
-                  className='text-sm text-gray-700 mr-4'
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDeleteTask(task.id)}
-                  className='text-sm text-red-600'
-                >
-                  Delete
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {/* Add/Edit Task Form */}
-      <div className='bg-gray-100 p-4 rounded'>
-        <h3 className='font-medium mb-2'>
-          {editingTaskId ? 'Edit Task' : 'Add New Task'}
-        </h3>
-        <form onSubmit={handleSubmit} className='flex flex-col space-y-3'>
-          {error && <p className='text-red-600'>{error}</p>}
-          <input
-            type='text'
-            placeholder='Task title'
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className='p-2 border'
-          />
-          <textarea
-            placeholder='Description (optional)'
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className='p-2 border'
-          />
-          <div className='flex items-center space-x-4'>
-            <button
-              type='submit'
-              className='bg-blue-600 text-white px-4 py-2 rounded'
-            >
-              {editingTaskId ? 'Update Task' : 'Add Task'}
-            </button>
-            {editingTaskId && (
-              <button
-                type='button'
-                onClick={() => {
-                  setEditingTaskId(null);
-                  setTitle('');
-                  setDescription('');
-                }}
-                className='text-sm'
-              >
-                Cancel
-              </button>
+      <main className='max-w-3xl mx-auto p-6'>
+        {/* Project Info */}
+        {project ? (
+          <div className='mb-8'>
+            <h2 className='text-2xl font-semibold text-gray-800'>
+              {project.name}
+            </h2>
+            {project.description && (
+              <p className='mt-2 text-gray-600'>{project.description}</p>
             )}
           </div>
-        </form>
-      </div>
+        ) : (
+          <div className='mb-8 text-center text-gray-600'>
+            Loading project...
+          </div>
+        )}
+
+        {/* Tasks List */}
+        <section className='mb-8'>
+          <h3 className='text-xl font-semibold mb-4 text-gray-800'>Tasks</h3>
+          {tasks.length === 0 ? (
+            <p className='text-gray-600'>No tasks for this project yet.</p>
+          ) : (
+            <ul className='space-y-4'>
+              {tasks.map((task) => (
+                <li
+                  key={task.id}
+                  className='bg-white p-4 rounded shadow flex justify-between items-start'
+                >
+                  <div>
+                    <p className='text-lg font-medium text-gray-800'>
+                      {task.title}
+                    </p>
+                    {task.description && (
+                      <p className='text-gray-600 mt-1'>{task.description}</p>
+                    )}
+                  </div>
+                  <div className='flex flex-col items-end space-y-2'>
+                    <button
+                      onClick={() => startEditTask(task)}
+                      className='text-sm text-blue-600 hover:underline'
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteTask(task.id)}
+                      className='text-sm text-red-600 hover:underline'
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        {/* Add/Edit Task Form */}
+        <section className='bg-white p-6 rounded shadow'>
+          <h3 className='text-2xl font-semibold mb-4 text-gray-800'>
+            {editingTaskId ? 'Edit Task' : 'Add New Task'}
+          </h3>
+          {error && <p className='text-red-600 mb-4'>{error}</p>}
+          <form onSubmit={handleSubmit} className='space-y-4'>
+            <input
+              type='text'
+              placeholder='Task Title'
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className='w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500'
+              required
+            />
+            <textarea
+              placeholder='Description (optional)'
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className='w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500'
+              rows={3}
+            ></textarea>
+            <div className='flex items-center space-x-4'>
+              <button
+                type='submit'
+                className='bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition-colors'
+              >
+                {editingTaskId ? 'Update Task' : 'Add Task'}
+              </button>
+              {editingTaskId && (
+                <button
+                  type='button'
+                  onClick={() => {
+                    setEditingTaskId(null);
+                    setTitle('');
+                    setDescription('');
+                  }}
+                  className='text-gray-600 hover:underline'
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
+          </form>
+        </section>
+      </main>
     </div>
   );
 }
