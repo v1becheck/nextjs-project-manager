@@ -16,7 +16,7 @@ A lightweight internal tool to manage projects and tasks.
 
 1. **Clone & Install**
    ```bash
-   git clone <repo-url>
+   git clone [<repo-url>](https://github.com/v1becheck/nextjs-project-manager.git)
    cd nextjs-project-manager
    npm install
    ```
