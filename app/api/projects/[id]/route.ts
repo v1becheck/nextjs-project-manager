@@ -1,5 +1,4 @@
-// app/api/projects/[id]/route.ts
-import { NextResponse, NextRequest, RouteHandlerContext } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 
@@ -18,37 +17,37 @@ function getUserId(request: NextRequest) {
   }
 }
 
-type Params = { id: string };
+interface RouteContext {
+  params: {
+    id: string;
+  };
+}
 
-export async function GET(
-  request: NextRequest,
-  { params }: RouteHandlerContext<Params>
-) {
+export async function GET(request: NextRequest, context: RouteContext) {
   const userId = getUserId(request);
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const projectId = parseInt(params.id, 10);
+  const projectId = parseInt(context.params.id, 10);
   const project = await prisma.project.findFirst({
     where: { id: projectId, userId },
   });
+
   if (!project) {
     return NextResponse.json({ error: 'Project not found' }, { status: 404 });
   }
+
   return NextResponse.json(project);
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: RouteHandlerContext<Params>
-) {
+export async function PUT(request: NextRequest, context: RouteContext) {
   const userId = getUserId(request);
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const projectId = parseInt(params.id, 10);
+  const projectId = parseInt(context.params.id, 10);
   const { name, description } = await request.json();
 
   const existing = await prisma.project.findFirst({
@@ -68,23 +67,22 @@ export async function PUT(
       description: description ?? existing.description,
     },
   });
+
   return NextResponse.json(updated);
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: RouteHandlerContext<Params>
-) {
+export async function DELETE(request: NextRequest, context: RouteContext) {
   const userId = getUserId(request);
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const projectId = parseInt(params.id, 10);
+  const projectId = parseInt(context.params.id, 10);
   const project = await prisma.project.findFirst({
     where: { id: projectId, userId },
     include: { tasks: true },
   });
+
   if (!project) {
     return NextResponse.json(
       { error: 'Project not found or forbidden' },
@@ -94,5 +92,6 @@ export async function DELETE(
 
   await prisma.task.deleteMany({ where: { projectId } });
   await prisma.project.delete({ where: { id: projectId } });
+
   return NextResponse.json({ message: 'Project deleted' });
 }
