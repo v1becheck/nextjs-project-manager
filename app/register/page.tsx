@@ -64,7 +64,7 @@ export default function RegisterPage() {
           />
           <button
             type='submit'
-            className='w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition-colors'
+            className='w-full bg-green-600 text-white py-2 cursor-pointer rounded hover:bg-green-700 transition-colors'
           >
             Register
           </button>

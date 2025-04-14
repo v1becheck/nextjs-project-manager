@@ -17,18 +17,21 @@ model User {
 }
 
 model Project {
-  id          Int     @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   name        String
   description String?
   userId      Int
-  user        User    @relation(fields: [userId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
   tasks       Task[]
 }
 
 model Task {
-  id          Int     @id @default(autoincrement())
-  title       String
+  id         Int       @id @default(autoincrement())
+  title      String
   description String?
-  projectId   Int
-  project     Project @relation(fields: [projectId], references: [id])
+  status     String    @default("todo")        
+  due_date   DateTime?                          
+  priority   String    @default("medium")       
+  projectId  Int
+  project    Project   @relation(fields: [projectId], references: [id])
 }
