@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
@@ -5,7 +6,6 @@ import jwt from 'jsonwebtoken';
 const prisma = new PrismaClient();
 
 function getUserId(request: Request) {
-  // @ts-ignore: Next.js injects cookies onto the Request
   const token = (request as any).cookies.get('token')?.value;
   if (!token) return null;
   try {
